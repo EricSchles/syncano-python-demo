@@ -1,4 +1,5 @@
 from syncano import client
+from syncano import callbacks
 
 with client.SyncanoApi(instance_name, apikey) as syncano:
     project = syncano.project_new('test', message_id=1)
@@ -24,3 +25,18 @@ with  client.SyncanoAsyncApi(instance_name, apikey) as syncano:
         message =  syncano.get_message(blocking=False)
         if message:
             print ('message', message)
+
+#Creating message callback, that is printing all messages from server
+class PrintCallback(callbacks.JsonCallback):
+    
+    def process_message(self, received):
+        print (received)
+        
+with client.SyncanoAsyncApi(instance_name, apikey, callback_handler=PrintCallback) as syncano:
+    pass
+
+#Using ObjectCallback to get "object like" response with methods
+with client.SyncanoApi(instance_name, apikey, callback_handler=callbacks.ObjectCallback) as syncano:
+    project = syncano.project.new(name)
+    project.update(new_name)
+    project.delete()
